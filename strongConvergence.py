@@ -50,7 +50,6 @@ def plotRealization(startloc):
     for t in ts:
         if t == t0:
             particle = Particle(startloc)
-            s1 = particle.z
         else:
             s1 = particle.simulate(dt)
         Ss.append(s1)
@@ -58,7 +57,7 @@ def plotRealization(startloc):
     plt.plot(ts,Ss)
 
 for i in range(20):
-    plotRealization(0.5)
+    plotRealization(1)
 
 plt.legend()
 plt.show()
