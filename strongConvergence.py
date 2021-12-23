@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random as random
 import math as math
+from WeinerGenerator import getWeiner
 
 b = -0.05
 
@@ -32,32 +33,49 @@ class Particle():
     def __init__(self, z):
         self.z = z
 
-    def simulate(self, dt):
-        z0 = self.z
-        z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*random.gauss(0,1)*math.sqrt(dt)#*randomFactor
-        if z1 < 0:
-            z1 = -z1
-        if z1 > h:
-            z1 = 2*h-z1
-        self.z = z1 
-        return z1
+    def simulate(self, ts, ws, dt):
+        zs = []
+        for index, t in enumerate(ts):
+            #Story history
+            zs.append(self.z)
 
-def plotRealization(startloc):
-    s0 = 1
-    s1 = 0
-    ts = np.linspace(t0, tend, steps)
-    Ss = []
-    for t in ts:
-        if t == t0:
-            particle = Particle(startloc)
-        else:
-            s1 = particle.simulate(dt)
-        Ss.append(s1)
+            #Advance
+            z0 = self.z
+            z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*ws[index]
 
-    plt.plot(ts,Ss)
+            print(ws[index])
+            print(dKdz(z0)*dt)
+            print(math.sqrt(2*K(z0))*ws[index])
 
-for i in range(20):
-    plotRealization(1)
+            #Store result
+            self.z = z1 
+
+            #Correct if out of bounds
+            self.correctBounds()
+
+        return zs
+
+    def correctBounds(self):
+        if abs(self.z) > 2*h:
+            print("Severe out of bounds")
+            exit()
+        if self.z < 0:
+            self.z = - self.z
+        if self.z > h:
+            self.z = 2*h - self.z
+        return
+
+
+        
+
+def plotRealization():
+    ts, ws, dt = getWeiner(100000,10)
+    particle = Particle(0)
+    zs = particle.simulate(ts, ws, dt)
+
+    plt.plot(ts,zs)
+
+plotRealization()
 
 plt.legend()
 plt.show()
