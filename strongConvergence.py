@@ -33,7 +33,7 @@ class Particle():
     def __init__(self, z):
         self.z = z
 
-    def simulate(self, ts, ws, dt):
+    def simulate(self, ts, dws, dt):
         zs = []
         for index, t in enumerate(ts):
             #Story history
@@ -41,11 +41,7 @@ class Particle():
 
             #Advance
             z0 = self.z
-            z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*ws[index]
-
-            print(ws[index])
-            print(dKdz(z0)*dt)
-            print(math.sqrt(2*K(z0))*ws[index])
+            z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*dws[index]
 
             #Store result
             self.z = z1 
@@ -65,13 +61,10 @@ class Particle():
             self.z = 2*h - self.z
         return
 
-
-        
-
 def plotRealization():
-    ts, ws, dt = getWeiner(100000,10)
+    ts, ws, dws, dt = getWeiner(1000000,10)
     particle = Particle(0)
-    zs = particle.simulate(ts, ws, dt)
+    zs = particle.simulate(ts, dws, dt)
 
     plt.plot(ts,zs)
 
