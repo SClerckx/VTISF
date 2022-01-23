@@ -54,6 +54,8 @@ def getWeinerSubset(Nth, baseSteps, baseTend, baseRealization):
     Nth, get every nth item from set
     dt = basedt * Nth
     """
+    assert baseSteps%Nth == 0
+
     baseTs, baseWs, baseDws, baseDt = getWeiner(baseSteps, baseTend, baseRealization)
 
     subTs = baseTs[0::Nth] #start_from = 0 every_nth = 2 a_list[start_from::every_nth]
