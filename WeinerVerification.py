@@ -1,9 +1,12 @@
 from cProfile import label
 import numpy as np
 import matplotlib.pyplot as plt
-from WeinerGenerator import getWeiner
+from WeinerGenerator import getWeiner, getWeinerSubset
 from scipy.stats import norm
 import math
+
+from tqdm import tqdm
+import time
 
 def plotWeinerSteps(steps, tend, maxsteps):
     ts, ws, dws, dt = getWeiner(steps, tend)
@@ -51,11 +54,13 @@ maxsteps = 50
 
 fig3 = plt.figure()
 
-for steps in np.arange(2,maxsteps):
+start = time.time()
+for steps in tqdm(np.arange(2,maxsteps)):
     x,y = getRealizationDistribution(steps, 5000)
     plt.plot(x, y, color=((maxsteps-steps)/maxsteps, 0, steps/maxsteps), label = steps)
     print(steps)
 
+print(f"runtime {start - time.time()}")
 #plt.plot(x2, y2, label = "100")
 
 plt.legend()

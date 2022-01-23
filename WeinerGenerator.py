@@ -7,7 +7,7 @@ import math as math
 import os
 
 def generateWeiner(wstart, steps, tend, dt):
-    ts = np.linspace(0, tend, steps)
+    ts = np.linspace(0, tend, steps+1) #items = steps + 1
     ws = []
     dws = []
     w = wstart
@@ -16,13 +16,19 @@ def generateWeiner(wstart, steps, tend, dt):
         dw = random.gauss(0,1)*math.sqrt(dt)
         dws.append(dw)
         w += dw
+    """
+    example:
+    ts:  0,    1,     2
+    ws:  0,    0.45,  0.67, (0.55 gets calculated but not stored)
+    dws: 0.45, 0.22, -0.12 <-- this last value gets used to calculate the 0.55 but is actually useless because the 0.55 is not stored
+    """
     ws = np.array(ws)
     dws = np.array(dws)
     return ts, ws, dws
 
-def getWeiner(steps, tend, realization = 0):
+def getWeiner(steps, tend, realization):
     """
-    n gives a new realization
+    new realization index gives a new realization
     """
     dt = tend/steps
     filepath = os.path.join(os.path.join(os.path.abspath(os.getcwd()), "WeinerRealizations"), f"{steps},{tend},{dt:e}")
@@ -42,3 +48,19 @@ def saveWeiner(filepath, filename, fullname, ts, ws, dws, dt):
     f = open(fullname, 'wb')
     np.savetxt(f, (ts,ws,dws))
     f.close()
+
+def getWeinerSubset(Nth, baseSteps, baseTend, baseRealization):
+    """
+    Nth, get every nth item from set
+    dt = basedt * Nth
+    """
+    baseTs, baseWs, baseDws, baseDt = getWeiner(baseSteps, baseTend, baseRealization)
+
+    subTs = baseTs[0::Nth] #start_from = 0 every_nth = 2 a_list[start_from::every_nth]
+    subWs = baseWs[0::Nth]
+    subDws = np.diff(subWs) #for i in subWs: subDws.append(subWs[i+1] - subWs[i])
+    subDws = np.append(subDws, 0) #add last useless value to dws
+    subDt = baseDt * Nth
+
+    return  subTs, subWs, subDws, subDt
+
