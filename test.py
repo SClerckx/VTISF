@@ -28,13 +28,21 @@ def dKdz(z):
         dKdz = 3*h-4*z
     return dKdz
 
+def dgdz(z):
+    if z <= threshold:
+        dgdz = math.sqrt(2) * (h - 4 * z) / (2 * math.sqrt(z * (h - 2 * z)))
+    else:
+        dgdz = math.sqrt(2) * (3 * h - 4 * z) / (2 * math.sqrt(-h**2 + 3 * h * z - 2 * z**2))
+    return dgdz
+
 class Particle():
     def __init__(self, z):
         self.z = z
 
     def simulate(self, dt):
         z0 = self.z
-        z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*random.gauss(0,1)*math.sqrt(dt)#*randomFactor
+        z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*random.gauss(0,1)*math.sqrt(dt)#*randomFactor # Euler
+        z1 = z0 + dKdz(z0) * dt + math.sqrt(2 * K(z0)) * random.gauss(0,1) * math.sqrt(dt) + 0.5 * math.sqrt(2 * K(z0)) * dgdz(z0) * (random.gauss(0,1)**2 - dt)
         if z1 < 0:
             z1 = -z1
         if z1 > h:
