@@ -38,9 +38,9 @@ def dKdz(z):
 def dgdz(z):
     #print(z)
     if z < threshold and z > 0:
-        dgdz = math.sqrt(2) * (h - 4 * z) / (2 * math.sqrt(z * (h - 2 * z)))
+        dgdz = math.sqrt(2 * Kbar) * (h - 4 * z) / (2 * math.sqrt(z * (h - 2 * z)))
     elif z > threshold and z < h:
-        dgdz = math.sqrt(2) * (3 * h - 4 * z) / (2 * math.sqrt(-h**2 + 3 * h * z - 2 * z**2))
+        dgdz = math.sqrt(2 * Kbar) * (3 * h - 4 * z) / (2 * math.sqrt(-h**2 + 3 * h * z - 2 * z**2))
     else:
         dgdz = 0
     return dgdz
