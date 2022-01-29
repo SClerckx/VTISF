@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,10 +15,10 @@ b = -0.05
 
 t0 = 0
 tend = 1
-steps = 100000
+steps = 100000 #100000
 dt = (tend-t0)/steps
 h = 1.0
-threshold = h/2
+threshold = h/2.0
 Kbar = 1.0
 
 def K(z):
@@ -29,10 +36,13 @@ def dKdz(z):
     return dKdz
 
 def dgdz(z):
-    if z <= threshold:
+    #print(z)
+    if z < threshold and z > 0:
         dgdz = math.sqrt(2) * (h - 4 * z) / (2 * math.sqrt(z * (h - 2 * z)))
-    else:
+    elif z > threshold and z < h:
         dgdz = math.sqrt(2) * (3 * h - 4 * z) / (2 * math.sqrt(-h**2 + 3 * h * z - 2 * z**2))
+    else:
+        dgdz = 0
     return dgdz
 
 class Particle():
@@ -41,12 +51,14 @@ class Particle():
 
     def simulate(self, dt):
         z0 = self.z
-        z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*random.gauss(0,1)*math.sqrt(dt)#*randomFactor # Euler
-        z1 = z0 + dKdz(z0) * dt + math.sqrt(2 * K(z0)) * random.gauss(0,1) * math.sqrt(dt) + 0.5 * math.sqrt(2 * K(z0)) * dgdz(z0) * (random.gauss(0,1)**2 - dt)
+        # z1 = z0 + dKdz(z0)*dt + math.sqrt(2*K(z0))*random.gauss(0,1)*math.sqrt(dt)#*randomFactor # Euler
+        z1 = z0 + dKdz(z0) * dt + math.sqrt(2 * K(z0)) * random.gauss(0,1) * math.sqrt(dt) + 0.5 * math.sqrt(2 * K(z0)) * dgdz(z0) * (random.gauss(0,1)**2 * dt - dt)
+        # print(z0, z1)
         if z1 < 0:
             z1 = -z1
         if z1 > h:
-            z1 = 2*h-z1
+            # z1 = 2*h-z1
+            z1 = 0.99 # If using Milstein the above won't assure the particles stay within range
         self.z = z1 
         return z1
 
