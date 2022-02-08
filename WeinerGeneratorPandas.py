@@ -5,8 +5,8 @@ from matplotlib.collections import LineCollection
 import random as random
 import math as math
 import os
-
-from sympy import false
+import pandas
+from sympy import false, true 
 #from numba import njit
 
 #@njit
@@ -30,7 +30,7 @@ def generateWeiner(wstart, steps, tend, dt):
     dws = np.array(dws)
     return ts, ws, dws
 
-def getWeiner(steps, tend, realization, noIO = False):
+def getWeinerPandas(steps, tend, realization, noIO = False):
     """
     new realization index gives a new realization
     """
@@ -39,12 +39,16 @@ def getWeiner(steps, tend, realization, noIO = False):
     filename = str(realization) #+ ".csv"
     fullname = os.path.join(filepath, filename)
 
-    if noIO: 
+    if noIO:
         ts, ws, dws = generateWeiner(0, steps, tend, dt)
         saveWeiner(filepath, filename, fullname, ts, ws, dws, dt)
     else:
         if os.path.exists(fullname):
-            ts, ws, dws = np.load(fullname, allow_pickle = True)
+            #dataframe = pandas.read_csv(fullname)
+            #print(dataframe.to_numpy())
+            #ts, ws, dws = dataframe.to_numpy()
+            #print("test")
+            ts, ws, dws = np.load(fullname, allow_pickle = true)
         else:
             ts, ws, dws = generateWeiner(0, steps, tend, dt)
             saveWeiner(filepath, filename, fullname, ts, ws, dws, dt)
