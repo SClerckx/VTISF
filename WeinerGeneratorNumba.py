@@ -7,18 +7,19 @@ import math as math
 import os
 
 from sympy import false
-#from numba import njit
+from numba import njit
 
-#@njit
+@njit
 def generateWeiner(wstart, steps, tend, dt):
     ts = np.linspace(0, tend, steps+1) #items = steps + 1
-    ws = []
-    dws = []
+    ws = np.zeros(len(ts))
+    dws = np.zeros(len(ts))
     w = wstart
     for i, t in enumerate(ts):
-        ws.append(w)
+        ws[i] = w
         dw = random.gauss(0,1)*math.sqrt(dt)
-        dws.append(dw)
+        dws[i] = dw
+        #dws.append(dw)
         w += dw
     """
     example:
@@ -26,8 +27,8 @@ def generateWeiner(wstart, steps, tend, dt):
     ws:  0,    0.45,  0.67, (0.55 gets calculated but not stored)
     dws: 0.45, 0.22, -0.12 <-- this last value gets used to calculate the 0.55 but is actually useless because the 0.55 is not stored
     """
-    ws = np.array(ws)
-    dws = np.array(dws)
+    #ws = np.array(ws)
+    #dws = np.array(dws)
     return ts, ws, dws
 
 def getWeiner(steps, tend, realization, noIO = False):
