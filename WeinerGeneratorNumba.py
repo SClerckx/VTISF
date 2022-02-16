@@ -5,6 +5,7 @@ from matplotlib.collections import LineCollection
 import random as random
 import math as math
 import os
+from pyrsistent import v
 
 from sympy import false
 from numba import njit
@@ -61,6 +62,8 @@ def saveWeiner(filepath, filename, fullname, ts, ws, dws, dt):
 
 def getWeinerSubset(Nth, baseSteps, baseTend, baseRealization):
     """
+    No noIO option because that would mean subsets of the same baseRealizaiton would be independent from each other
+    to use noIO option, use getWeinerSubsets
     Nth, get every nth item from set
     dt = basedt * Nth
     """
@@ -76,3 +79,41 @@ def getWeinerSubset(Nth, baseSteps, baseTend, baseRealization):
 
     return  subTs, subWs, subDws, subDt
 
+def getWeinerSubsets(Nths, baseSteps, baseTend, baseRealization, noIO = False):
+    """
+    Get lots of subsets for a given baseRealization
+    Nth, get every nth item from set
+    dt = basedt * Nth
+    """
+    subsets = []
+    for Nth in Nths:
+        assert baseSteps%Nth == 0
+
+        baseTs, baseWs, baseDws, baseDt = getWeiner(baseSteps, baseTend, baseRealization, noIO = False)
+
+        subTs = baseTs[0::Nth] #start_from = 0 every_nth = 2 a_list[start_from::every_nth]
+        subWs = baseWs[0::Nth]
+        subDws = np.diff(subWs) #for i in subWs: subDws.append(subWs[i+1] - subWs[i])
+        subDws = np.append(subDws, 0) #add last useless value to dws
+        subDt = baseDt * Nth
+
+        subset = {}
+        subset['subTs'] = subTs
+        subset['subWs'] = subWs
+        subset['subDws'] = subDws
+        subset['subDt'] = subDt
+
+        subsets.append(subset)
+
+    return  subsets
+
+def constructWeinerSubset(Nth, baseTs, baseWs, baseDws, baseDt):
+    assert (len(baseTs)-1)%Nth == 0, f"{len(baseTs)-1} not divisible by {Nth}"
+
+    subTs = baseTs[0::Nth] #start_from = 0 every_nth = 2 a_list[start_from::every_nth]
+    subWs = baseWs[0::Nth]
+    subDws = np.diff(subWs) #for i in subWs: subDws.append(subWs[i+1] - subWs[i])
+    subDws = np.append(subDws, 0) #add last useless value to dws
+    subDt = baseDt * Nth
+
+    return  subTs, subWs, subDws, subDt
