@@ -11,8 +11,7 @@ from sympy import false
 from numba import njit
 
 @njit
-def generateWeiner(wstart, steps, tend, dt):
-    ts = np.linspace(0, tend, steps+1) #items = steps + 1
+def generateWeiner(wstart, ts, steps, tend, dt):
     ws = np.zeros(len(ts))
     dws = np.zeros(len(ts))
     w = wstart
@@ -30,7 +29,7 @@ def generateWeiner(wstart, steps, tend, dt):
     """
     #ws = np.array(ws)
     #dws = np.array(dws)
-    return ts, ws, dws
+    return ws, dws
 
 def getWeiner(steps, tend, realization, noIO = False):
     """
@@ -40,15 +39,17 @@ def getWeiner(steps, tend, realization, noIO = False):
     filepath = os.path.join(os.path.join(os.path.abspath(os.getcwd()), "WeinerRealizations"), f"{steps},{tend},{dt:e}")
     filename = str(realization) #+ ".csv"
     fullname = os.path.join(filepath, filename)
-
+    
     if noIO: 
-        ts, ws, dws = generateWeiner(0, steps, tend, dt)
+        ts = np.linspace(0, tend, steps+1) #items = steps + 1
+        ws, dws = generateWeiner(0, ts, steps, tend, dt)
         #saveWeiner(filepath, filename, fullname, ts, ws, dws, dt)
     else:
         if os.path.exists(fullname):
             ts, ws, dws = np.load(fullname, allow_pickle = True)
         else:
-            ts, ws, dws = generateWeiner(0, steps, tend, dt)
+            ts = np.linspace(0, tend, steps+1) #items = steps + 1
+            ws, dws = generateWeiner(0, ts, steps, tend, dt)
             saveWeiner(filepath, filename, fullname, ts, ws, dws, dt)
 
     return ts, ws, dws, dt
